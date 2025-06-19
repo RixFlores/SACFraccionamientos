@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+.background {
+    background-image: url('./assets/tiny-grid.png');
+    height: 100vh;
+}
+
+.formContainer{
+    background-color: white;
+    margin-top: 25px;
+    max-width: 500px; 
+    margin: auto; 
+    padding: 24px; 
+    margin-top: 20px; 
+    margin-bottom: 20px;
+}
+
+.tableContainer {
+    background-color: white;
+    margin-top: 25px;
+    width: 98%;
+    margin: auto; 
+    padding: 24px; 
+    margin-top: 20px; 
+    margin-bottom: 20px;
+}

@@ -1,0 +1,11 @@
+<div class="container" *ngIf="!spinnerShow">
+  <form class="login" #loginForm="ngForm">
+    <label>SAC - Fraccionamiento los agaves</label>
+    <input type="text" placeholder="Usuario" [(ngModel)]="credential.email" name="email" required>
+    <input type="password" placeholder="Contraseña" [(ngModel)]="credential.password" name="password" required>
+    <div *ngIf="loginError" class="alert alert-danger" style="margin-top: 10px;">
+      {{ loginError }}
+    </div>
+    <button type="submit" (click)="login()">Login</button>
+  </form>
+</div>

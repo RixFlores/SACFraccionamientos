@@ -1,0 +1,54 @@
+<div class="background">
+    <div class="row" *ngIf="tokenDecoded.rol == 'Admin'">
+        <div class="col">
+            <button class="btn btn-success" (click)="generateBills()">Generar recibos de cobro</button>
+        </div>
+    </div>
+    <div class="row tableContainer">
+        <div class="col">
+            <div>
+                <h1>Listado de cargos casa {{tokenDecoded.casa}}</h1>
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Concepto</th>
+                            <th scope="col">Monto</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Creado</th>
+                            <th scope="col">Modificado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let bal of balance">
+                            <th scope="row">{{bal.RecordId}}</th>
+                            <td>{{bal.Description}}</td>
+                            <td>{{bal.Concept}}</td>
+                            <td>${{bal.Amount}}</td>
+                            <td>
+                                <div *ngIf="bal.Status == 'Pendiente'">
+                                    <div class="alert alert-danger" role="alert">
+                                        {{bal.Status}}
+                                    </div>
+                                </div>
+                                <div *ngIf="bal.Status == 'Entregado'">
+                                    <div class="alert alert-warning" role="alert">
+                                        {{bal.Status}}
+                                    </div>
+                                </div>
+                                <div *ngIf="bal.Status == 'Pagado'">
+                                    <div class="alert alert-success" role="alert">
+                                        {{bal.Status}}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{bal.CreatedOn | date: "fullDate":"":"es" }}</td>
+                            <td>{{bal.LastModification | date: "fullDate":"":"es" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

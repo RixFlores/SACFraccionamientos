@@ -1,0 +1,52 @@
+.reglas-container {
+  background: #f4fff4;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 0 15px rgba(34, 139, 34, 0.2);
+  font-family: 'Segoe UI', sans-serif;
+  color: #2e7031;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem;
+  margin-top: 2rem;
+  color: #2c5f2d;
+  border-bottom: 2px solid #a8d5a2;
+  padding-bottom: 0.5rem;
+}
+
+.titulo img {
+  height: 32px;
+  margin-right: 10px;
+}
+
+.lista {
+      list-style: none; /* elimina viñetas o números */
+  margin-top: 1rem;
+  padding-left: 1.5rem;
+}
+
+.lista li {
+  margin: 0.5rem 0;
+  padding-left: 0.5rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.lista li::before {
+  content: "🌿";
+  position: absolute;
+  left: -1.5rem;
+  color: #4caf50;
+}
+
+.reglas-fraccionamiento li {
+  color: #256d1b;
+}
+
+.reglas-verde li {
+  color: #2a8f3e;
+}
+

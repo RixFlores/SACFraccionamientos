@@ -1,0 +1,114 @@
+<mat-tab-group (selectedTabChange)="onTabChange($event)" class="background">
+    <mat-tab label="Registrar" (click)="ngOnInit()" *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin'">
+        <div class="mat-elevation-z2 formContainer">
+            <h2>Registro de gastos</h2>
+            <form [formGroup]="billsForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Concepto</mat-label>
+                            <input matInput formControlName="description" type="text" required>
+                        </mat-form-field>
+                    </div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Monto</mat-label>
+                            <span matPrefix>$&nbsp;</span>
+                            <input matInput formControlName="amount" type="number" required>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <button mat-raised-button color="primary" type="submit">Registrar</button>
+            </form>
+        </div>
+    </mat-tab>
+    <mat-tab label="Listado" (click)="ngOnInit()">
+        <div style="padding: 20px;" class="tableContainer">
+            <h1>Listado de gastos</h1>
+            <div style="margin-bottom: 20px;">
+                <mat-form-field appearance="fill" style="margin-right: 16px;">
+                    <mat-label>Fecha inicio</mat-label>
+                    <input matInput [matDatepicker]="picker1" [(ngModel)]="fechaInicio"
+                        (dateChange)="filtrarPorFechas()" name="fechaInicio">
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Fecha fin</mat-label>
+                    <input matInput [matDatepicker]="picker2" [(ngModel)]="fechaFin" (dateChange)="filtrarPorFechas()"
+                        name="fechaFin">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Registró</th>
+                        <th scope="col">Concepto</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Aprobado por</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let bill of bills">
+                        <th scope="row">{{bill.billId}}</th>
+                        <td>{{bill.UserFullName}}</td>
+                        <td>{{bill.description}}</td>
+                        <td>${{bill.Amount}}</td>
+                        <td>
+
+                            <div *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin'">
+                                <mat-form-field appearance="fill" style="min-width: 120px;" [ngClass]="{
+                                'status-registrado': bill.Status === 'Registrado',
+                                'status-aprobado': bill.Status === 'Aprobado'
+                                }">
+                                <mat-select [value]="bill.Status" (selectionChange)="updateStatus(bill, $event.value)">
+                                    <mat-option value="Registrado">Registrado</mat-option>
+                                    <mat-option value="Aprobado">Aprobado</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            </div>
+
+                            <div *ngIf="tokenDecoded.rol == 'Residente'">
+                                <span [ngClass]="{
+                                    'status-registrado': bill.Status === 'Registrado',
+                                    'status-aprobado': bill.Status === 'Aprobado'
+                                }">{{ bill.Status }}</span>
+                            </div>
+
+
+
+                            
+                        </td>
+                        <td>
+                            <ng-container *ngIf="bill.ApprovedByFullName; else noApproved">
+                                {{ bill.ApprovedByFullName }}
+                            </ng-container>
+                            <ng-template #noApproved>
+                                <span class="text-muted">No aprobado</span>
+                            </ng-template>
+                        </td>
+                        <td>{{bill.Date | date: "fullDate":"":"es" }}</td>
+                        <td>
+                            <button class="btn btn-danger" (click)="deleteBill(bill)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path
+                                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                    <path
+                                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </mat-tab>
+</mat-tab-group>

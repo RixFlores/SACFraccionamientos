@@ -1,0 +1,145 @@
+.emergencia-container {
+  background: #e7fbe7;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+  font-family: 'Segoe UI', sans-serif;
+  color: #2c5f2d;
+  margin-top: 1rem;
+}
+
+.titulo-emergencia {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  color: #1b5e20;
+  border-bottom: 2px solid #a8d5a2;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.titulo-emergencia img {
+  height: 32px;
+  margin-right: 10px;
+}
+
+.lista-emergencia {
+  list-style: none;
+  padding-left: 0;
+}
+
+.lista-emergencia li {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.icono {
+  font-size: 1.5rem;
+  width: 2rem;
+  text-align: center;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  padding: 0.3rem;
+  color: white;
+}
+
+
+
+
+
+
+.lista-emergencia li {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-llamar {
+  margin-left: auto;
+  background-color: #43a047;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-llamar:hover {
+  background-color: #2e7d32;
+}
+
+.icono {
+  font-size: 1.5rem;
+  width: 2rem;
+  text-align: center;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  padding: 0.3rem;
+  color: white;
+}
+
+
+
+
+
+
+.lista-emergencia {
+  list-style: none;
+  padding-left: 0;
+}
+
+.lista-emergencia li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f0f8f5;
+  padding: 0.8rem;
+  border-radius: 12px;
+}
+
+.icono {
+  font-size: 1.8rem;
+  padding: 0.4rem;
+  border-radius: 50%;
+  color: white;
+  flex-shrink: 0;
+}
+
+.info-emergencia {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.info-emergencia span {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.info-emergencia strong {
+  font-size: 1.1rem;
+  color: #2e7d32;
+}
+
+.btn-llamar {
+  background-color: #43a047;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.btn-llamar:hover {
+  background-color: #2e7d32;
+}

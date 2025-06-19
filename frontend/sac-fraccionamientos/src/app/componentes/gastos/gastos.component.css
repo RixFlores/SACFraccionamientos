@@ -1,0 +1,19 @@
+
+.status-registrado {
+  background-color: #fff3cd; /* Amarillo claro */
+  border-radius: 4px;
+}
+
+.status-aprobado {
+  background-color: #d4edda; /* Verde claro */
+  border-radius: 4px;
+}
+
+.status-rechazado {
+  background-color: #f8d7da; /* Rojo claro */
+  border-radius: 4px;
+}
+
+.status-aprobado .mat-select-trigger {
+  color: #155724; /* Verde oscuro */
+}

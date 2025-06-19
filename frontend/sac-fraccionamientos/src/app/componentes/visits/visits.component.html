@@ -1,0 +1,107 @@
+<mat-tab-group class="background">
+    <mat-tab label="Registrar"  *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin' || tokenDecoded.rol == 'Caseta'">
+        <div class="mat-elevation-z2 formContainer">
+            <h2>Registro de Visitas</h2>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Nombre</mat-label>
+                            <input matInput formControlName="Name" required>
+                        </mat-form-field>
+                    </div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Visitan a</mat-label>
+                            <mat-select formControlName="UserId" required>
+                                <mat-option *ngFor="let user of users" [value]="user.UserId">
+                                    {{user.FirstName}} {{user.LastName}} | Casa {{user.HouseNumber}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- <div class="col">
+                        <mat-form-field appearance="fill" class="w-100">
+                            <mat-label>Status</mat-label>
+                            <mat-select formControlName="status" required>
+                                <mat-option *ngFor="let status of statuses" [value]="status">{{ status }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div> -->
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100">
+                            <mat-label>Vehículo</mat-label>
+                            <mat-select formControlName="Vehicle" required>
+                                <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle">{{ vehicle
+                                    }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Número de visitantes</mat-label>
+                            <input matInput formControlName="NumberOfVisitors" type="number" required>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <button mat-raised-button color="primary" type="submit">Registrar</button>
+            </form>
+        </div>
+    </mat-tab>
+    <mat-tab label="Listado">
+        <div style="padding: 20px;" class="tableContainer">
+            <h2>Listado de visitas</h2>
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Visitante</th>
+                        <th scope="col">Visita a</th>
+                        <th scope="col"># de visitantes</th>
+                        <th scope="col">Vehículo</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Registró</th>
+                        <th scope="col">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let visits of visitors">
+                        <th scope="row">{{visits.VisitorId }}</th>
+                        <td>{{visits.Name}}</td>
+                        <td>{{visits.UserFullName}}</td>
+                        <td style="text-align: center;">{{visits.NumberOfVisitors}}</td>
+                        <td>{{visits.Vehicle}}</td>
+                        <td>
+                            <div *ngIf="visits.Status == 'Entra'">
+                                <div class="alert alert-success" role="alert" style="text-align: center;">
+                                    {{visits.Status}}
+                                </div>
+                            </div>
+                            <div *ngIf="visits.Status == 'Salio'">
+                                <div class="alert alert-secondary" role="alert" style="text-align: center;">
+                                    {{visits.Status}}
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{visits.Date | date: "fullDate":"":"es" }}</td>
+                        <td>{{visits.RegisteredByFullName}}</td>
+                        <td>
+                            <button class="btn btn-danger" (click)="deleteVisit(visits)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path
+                                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                    <path
+                                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </mat-tab>
+</mat-tab-group>

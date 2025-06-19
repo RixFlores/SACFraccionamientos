@@ -1,0 +1,85 @@
+<h2 mat-dialog-title>Editar Usuario</h2>
+<form *ngIf="editForm" [formGroup]="editForm" (ngSubmit)="onSave()">
+  <mat-dialog-content class="mat-typography">
+    <div class="row">
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" required>
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Contraseña (nueva)</mat-label>
+          <input matInput formControlName="password" type="password" placeholder="Dejar en blanco para mantener">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Rol</mat-label>
+          <mat-select formControlName="roleId" required>
+            <mat-option *ngFor="let role of roles" [value]="role.label">
+              {{ role.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="firstName" required>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="lastName" required>
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Número de casa</mat-label>
+          <input matInput formControlName="houseNumber" type="number" required>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Residentes</mat-label>
+          <input matInput formControlName="residents" type="number" required>
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="Phone" type="number" required>
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Moroso</mat-label>
+
+          <mat-select formControlName="Debtor" required>
+            <mat-option *ngFor="let debtStatus of debtors" [value]="debtStatus">
+              {{ debtStatus }}
+            </mat-option>
+          </mat-select>
+          
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Guardar</button>
+  </mat-dialog-actions>
+</form>
