@@ -4,6 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/servicios/user.service';
 import { DeleteUserComponent } from '../dialogs/delete-user/delete-user.component';
 import { EditUserComponent } from '../dialogs/edit-user/edit-user.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { RolesService } from 'src/app/servicios/roles.service';
+import { CookieService } from 'ngx-cookie-service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'usuarios',
@@ -14,14 +18,26 @@ export class UsuariosComponent implements OnInit {
   users: any;
   registerForm!: FormGroup;
   message: string = '';
+  roles: any;
+  cookieUser: string = '';
+  tokenDecoded: any;
+  rol = '';
+  claimNames: string[] = [];
 
   constructor(
     private userService: UserService,
+    private cookieService: CookieService,
     private fb: FormBuilder,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private rolesService: RolesService
   ) { }
 
   ngOnInit(): void {
+    this.cookieUser = this.cookieService.get('accessToken');
+    this.tokenDecoded = this.getDecodedAccessToken(this.cookieUser);
+    this.rol = this.tokenDecoded.rol;
+
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -32,11 +48,28 @@ export class UsuariosComponent implements OnInit {
       residents: ['', [Validators.required, Validators.pattern("^[0-9]*$")]]
     });
 
+    this.rolesService.listOfClaims(this.rol).subscribe((names) => {
+      this.claimNames = names;
+      console.log('Claims de servicio:', this.claimNames);
+    });
+
     this.userService.getUsers()
       .subscribe(
         (success) => {
           this.users = success.success
+          this.updatePagination();
           console.log(success)
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+    this.rolesService.getRoles()
+      .subscribe(
+        (success) => {
+          this.roles = success.roles;
+          console.log("ROLES", success)
         },
         (error) => {
           console.log(error);
@@ -48,7 +81,7 @@ export class UsuariosComponent implements OnInit {
     if (this.registerForm.valid) {
       const payload = {
         Email: this.registerForm.value.email,
-        Password: this.registerForm.value.password, // o crea otro campo para esto
+        Password: this.registerForm.value.password,
         RoleId: this.registerForm.value.roleId,
         FirstName: this.registerForm.value.firstName,
         LastName: this.registerForm.value.lastName,
@@ -60,22 +93,40 @@ export class UsuariosComponent implements OnInit {
         next: (response) => {
           console.log('Registro exitoso:', response);
           this.message = 'Registro exitoso';
-          this.registerForm.reset();
+
+          this.snackBar.open('Usuario registrado correctamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success']
+          });
+
+          this.ngOnInit();
         },
         error: (error) => {
           console.error('Error al registrar:', error);
-          this.message = 'Error en el registro';
-          if (error.error?.msg) {
-            this.message = `Error: ${error.error.msg}`;
-          } else {
-            this.message = 'Error desconocido en el registro';
-          }
+          const errorMsg = error.error?.msg || 'Error desconocido en el registro';
+          this.message = errorMsg;
+
+          this.snackBar.open(`Error: ${errorMsg}`, 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
         }
       });
 
     } else {
       console.log('Formulario inválido');
       this.message = 'Formulario inválido';
+
+      this.snackBar.open('Por favor completa todos los campos requeridos.', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-warning']
+      });
     }
   }
 
@@ -128,6 +179,45 @@ export class UsuariosComponent implements OnInit {
       },
       error: err => this.message = 'Error actualizando: ' + (err.error?.msg || err.message)
     });
+  }
+
+  hasClaim(name: string): boolean {
+    return this.claimNames.includes(name);
+  }
+
+  getDecodedAccessToken(accessToken: string): any {
+    try {
+      return jwtDecode(accessToken);
+    } catch (Error) {
+      var invalid = "Invalid user";
+    }
+  }
+
+
+  /* Paginador Bootstrap */
+  pagedUsers: any[] = [];
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 0;
+  totalPagesArray: number[] = [];
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.users.length / this.pageSize);
+    this.totalPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedUsers = this.users.slice(start, end);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  onPageSizeChange() {
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
 }

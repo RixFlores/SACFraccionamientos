@@ -1,0 +1,143 @@
+<mat-tab-group (selectedTabChange)="onTabChange($event)" class="background">
+    <mat-tab label="Registrar" (click)="ngOnInit()" *ngIf="hasClaim('Crear Cuotas')">
+        <div class="mat-elevation-z2 formContainer">
+            <h2>Registro de cuotas</h2>
+            <form [formGroup]="cuotasForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <!-- <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Concepto</mat-label>
+                            <mat-select formControlName="concept" required>
+                                <mat-option value="Mensualidad">Mensualidad</mat-option>
+                                <mat-option value="Multa">Multa</mat-option>
+                                <mat-option value="Otros">Otros</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Monto</mat-label>
+                            <span matPrefix>$&nbsp;</span>
+                            <input matInput formControlName="amount" type="number" required>
+                        </mat-form-field>
+                    </div> -->
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Concepto</mat-label>
+                            <mat-select formControlName="concept" required>
+                                <mat-option *ngFor="let multa of multas" [value]="multa">
+                                    {{multa.Name}}: ${{multa.Amount}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Deudor</mat-label>
+                            <mat-select formControlName="userId" required>
+                                <mat-option *ngFor="let user of users" [value]="user.UserId">
+                                    {{user.FirstName}} {{user.LastName}} | Casa {{user.HouseNumber}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col">
+                        <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
+                            <mat-label>Descripción</mat-label>
+                            <input matInput formControlName="description" type="text" required>
+                        </mat-form-field>
+                    </div>
+
+                </div>
+                <button class="btn btn-success" type="submit">Registrar</button>
+            </form>
+        </div>
+    </mat-tab>
+    <mat-tab label="Listado" (click)="ngOnInit()" *ngIf="hasClaim('Ver Cuotas')">
+        <div style="padding: 20px;" class="tableContainer">
+            <h1>Listado de cuotas</h1>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field appearance="fill" style="width: auto;">
+                        <mat-label>Deudor</mat-label>
+                        <input matInput [(ngModel)]="filtroDeudor" (input)="filtrarPorDeudor()" name="filtroDeudor"
+                            placeholder="Nombre o casa">
+                    </mat-form-field>
+                </div>
+            </div>
+            <table class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Deudor</th>
+                        <th scope="col">Monto</th>
+                        <th scope="col">Concepto</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Creada</th>
+                        <th scope="col">Modificada</th>
+                        <th scope="col">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cuota of coutas">
+                        <th scope="row">{{cuota.RecordId}}</th>
+                        <td>{{cuota.UserFullName}}</td>
+                        <td>${{cuota.Amount}}</td>
+                        <td>{{cuota.Concept}}</td>
+                        <td>{{cuota.Description}}</td>
+                        <td>
+                            <ng-container *ngIf="hasClaim('Actualizar Cuotas'); else viewOnly">
+                                <mat-form-field appearance="fill" style="min-width: 120px;" [ngClass]="{
+                                                    'status-registrado': cuota.Status === 'Entregado',
+                                                    'status-aprobado': cuota.Status === 'Pagado',
+                                                    'status-rechazado': cuota.Status === 'Pendiente'                                                   
+                                                }">
+                                    <mat-select [value]="cuota.Status"
+                                        (selectionChange)="updateStatus(cuota, $event.value)">
+                                        <mat-option value="Pendiente">Pendiente</mat-option>
+                                        <mat-option value="Entregado">Entregado</mat-option>
+                                        <mat-option value="Pagado">Pagado</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </ng-container>
+
+                            <ng-template #viewOnly>
+                                <div *ngIf="cuota.Status == 'Pendiente'">
+                                    <div class="alert alert-danger" role="alert">
+                                        {{cuota.Status}}
+                                    </div>
+                                </div>
+                                <div *ngIf="cuota.Status == 'Entregado'">
+                                    <div class="alert alert-warning" role="alert">
+                                        {{cuota.Status}}
+                                    </div>
+                                </div>
+                                <div *ngIf="cuota.Status == 'Pagado'">
+                                    <div class="alert alert-success" role="alert">
+                                        {{cuota.Status}}
+                                    </div>
+                                </div>
+                            </ng-template>
+
+                        </td>
+                        <td>{{cuota.CreatedOn | date: "fullDate":"":"es" }}</td>
+                        <td>{{cuota.LastModification | date: "fullDate":"":"es" }}</td>
+                        <td>
+                            <button class="btn btn-danger" (click)="deleteCuota(cuota)"
+                                *ngIf="hasClaim('Eliminar Cuotas')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path
+                                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                    <path
+                                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </mat-tab>
+</mat-tab-group>

@@ -26,7 +26,7 @@ const register = async (req, res) => {
         HouseNumber,
         Residents,
         Phone,
-        Debtor
+        Debtor = "No"
     } = req.body;
     console.log("BODY", req.body)
 

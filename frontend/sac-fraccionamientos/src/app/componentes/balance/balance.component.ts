@@ -21,12 +21,13 @@ export class BalanceComponent implements OnInit {
   ngOnInit(): void {
     this.cookieUser = this.cookieService.get('accessToken');
     this.tokenDecoded = this.getDecodedAccessToken(this.cookieUser);
-    console.log("Token",this.tokenDecoded);
-    this.balanceService.getBalance(this.tokenDecoded.id)
+    console.log("Token", this.tokenDecoded);
+    this.balanceService.getBalanceById(this.tokenDecoded.id)
       .subscribe(
         (success) => {
           console.log(success);
           this.balance = success.data
+          this.updatePagination();
           console.log(this.balance)
         },
         (error) => {
@@ -73,5 +74,31 @@ export class BalanceComponent implements OnInit {
     }
   }
 
+
+  /* Paginador Bootstrap */
+  pagedBalance: any[] = [];
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 0;
+  totalPagesArray: number[] = [];
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.balance.length / this.pageSize);
+    this.totalPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedBalance = this.balance.slice(start, end);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  onPageSizeChange() {
+    this.currentPage = 1;
+    this.updatePagination();
+  }
 
 }

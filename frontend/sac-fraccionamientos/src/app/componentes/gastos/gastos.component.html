@@ -1,5 +1,5 @@
 <mat-tab-group (selectedTabChange)="onTabChange($event)" class="background">
-    <mat-tab label="Registrar" (click)="ngOnInit()" *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin'">
+    <mat-tab label="Registrar" (click)="ngOnInit()" *ngIf="hasClaim('Crear Gastos')">
         <div class="mat-elevation-z2 formContainer">
             <h2>Registro de gastos</h2>
             <form [formGroup]="billsForm" (ngSubmit)="onSubmit()">
@@ -7,40 +7,41 @@
                     <div class="col">
                         <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
                             <mat-label>Concepto</mat-label>
-                            <input matInput formControlName="description" type="text" required>
+                            <input matInput formControlName="description" type="text">
                         </mat-form-field>
                     </div>
                     <div class="col">
                         <mat-form-field appearance="fill" class="w-100" style="width: 100%;">
                             <mat-label>Monto</mat-label>
                             <span matPrefix>$&nbsp;</span>
-                            <input matInput formControlName="amount" type="number" required>
+                            <input matInput formControlName="amount" type="number">
                         </mat-form-field>
                     </div>
                 </div>
-                <button mat-raised-button color="primary" type="submit">Registrar</button>
+                <button class="btn btn-success" type="submit">Registrar</button>
             </form>
         </div>
     </mat-tab>
-    <mat-tab label="Listado" (click)="ngOnInit()">
+    <mat-tab label="Listado" (click)="ngOnInit()" *ngIf="hasClaim('Ver Gastos')">
         <div style="padding: 20px;" class="tableContainer">
             <h1>Listado de gastos</h1>
-            <div style="margin-bottom: 20px;">
-                <mat-form-field appearance="fill" style="margin-right: 16px;">
-                    <mat-label>Fecha inicio</mat-label>
-                    <input matInput [matDatepicker]="picker1" [(ngModel)]="fechaInicio"
-                        (dateChange)="filtrarPorFechas()" name="fechaInicio">
-                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                    <mat-datepicker #picker1></mat-datepicker>
-                </mat-form-field>
-
-                <mat-form-field appearance="fill">
-                    <mat-label>Fecha fin</mat-label>
-                    <input matInput [matDatepicker]="picker2" [(ngModel)]="fechaFin" (dateChange)="filtrarPorFechas()"
-                        name="fechaFin">
-                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                    <mat-datepicker #picker2></mat-datepicker>
-                </mat-form-field>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field appearance="fill" style="width: auto; margin-right: 10px;">
+                        <mat-label>Fecha inicio</mat-label>
+                        <input matInput [matDatepicker]="picker1" [(ngModel)]="fechaInicio"
+                            (dateChange)="filtrarPorFechas()" name="fechaInicio">
+                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" style="width: auto;">
+                        <mat-label>Fecha fin</mat-label>
+                        <input matInput [matDatepicker]="picker2" [(ngModel)]="fechaFin"
+                            (dateChange)="filtrarPorFechas()" name="fechaFin">
+                        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker #picker2></mat-datepicker>
+                    </mat-form-field>
+                </div>
             </div>
             <table class="table table-hover">
                 <thead class="thead-light">
@@ -52,39 +53,41 @@
                         <th scope="col">Estado</th>
                         <th scope="col">Aprobado por</th>
                         <th scope="col">Fecha</th>
-                        <th scope="col">Eliminar</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let bill of bills">
+                    <tr *ngFor="let bill of pagedBills">
                         <th scope="row">{{bill.billId}}</th>
                         <td>{{bill.UserFullName}}</td>
                         <td>{{bill.description}}</td>
                         <td>${{bill.Amount}}</td>
                         <td>
-
-                            <div *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin'">
+                            <ng-container *ngIf="hasClaim('Actualizar Gastos'); else viewOnly">
                                 <mat-form-field appearance="fill" style="min-width: 120px;" [ngClass]="{
-                                'status-registrado': bill.Status === 'Registrado',
-                                'status-aprobado': bill.Status === 'Aprobado'
-                                }">
-                                <mat-select [value]="bill.Status" (selectionChange)="updateStatus(bill, $event.value)">
-                                    <mat-option value="Registrado">Registrado</mat-option>
-                                    <mat-option value="Aprobado">Aprobado</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                            </div>
+                                                            'status-registrado': bill.Status === 'Registrado',
+                                                            'status-aprobado': bill.Status === 'Aprobado'
+                                                        }">
+                                    <mat-select [value]="bill.Status"
+                                        (selectionChange)="updateStatus(bill, $event.value)">
+                                        <mat-option value="Registrado">Registrado</mat-option>
+                                        <mat-option value="Aprobado">Aprobado</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </ng-container>
 
-                            <div *ngIf="tokenDecoded.rol == 'Residente'">
-                                <span [ngClass]="{
-                                    'status-registrado': bill.Status === 'Registrado',
-                                    'status-aprobado': bill.Status === 'Aprobado'
-                                }">{{ bill.Status }}</span>
-                            </div>
-
-
-
-                            
+                            <ng-template #viewOnly>
+                                <div *ngIf="bill.Status == 'Registrado'">
+                                    <div class="alert alert-warning" role="alert">
+                                        {{bill.Status}}
+                                    </div>
+                                </div>
+                                <div *ngIf="bill.Status == 'Aprobado'">
+                                    <div class="alert alert-success" role="alert">
+                                        {{bill.Status}}
+                                    </div>
+                                </div>
+                            </ng-template>
                         </td>
                         <td>
                             <ng-container *ngIf="bill.ApprovedByFullName; else noApproved">
@@ -96,7 +99,8 @@
                         </td>
                         <td>{{bill.Date | date: "fullDate":"":"es" }}</td>
                         <td>
-                            <button class="btn btn-danger" (click)="deleteBill(bill)">
+                            <button class="btn btn-danger" (click)="deleteBill(bill)"
+                                *ngIf="hasClaim('Eliminar Gastos')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-trash" viewBox="0 0 16 16">
                                     <path
@@ -109,6 +113,31 @@
                     </tr>
                 </tbody>
             </table>
+            
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <label class="me-2">Elementos por página:</label>
+                <select class="form-select w-auto" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                </select>
+            </div>
+
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                        <button class="page-link" (click)="goToPage(currentPage - 1)">Anterior</button>
+                    </li>
+                    <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+                        <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                        <button class="page-link" (click)="goToPage(currentPage + 1)">Siguiente</button>
+                    </li>
+                </ul>
+            </nav>
+
         </div>
     </mat-tab>
 </mat-tab-group>

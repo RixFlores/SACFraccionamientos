@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { url } from './url';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VisitsService {
 
-  private baseUrl = 'http://localhost:3900/api/visits';
+  private baseUrl = url+'/api/visits';
 
   constructor(private http: HttpClient) {}
 
@@ -29,6 +30,10 @@ export class VisitsService {
 
   getVisitsById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/visit/${id}`);
+  }
+
+   updateVisitStatus(id: number, newStatus: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/status/${id}/${newStatus}`, '');
   }
 
 }

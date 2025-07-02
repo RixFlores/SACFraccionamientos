@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { url } from './url';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BillsService {
-  private baseUrl = 'http://localhost:3900/api/bills';
-  private baseUrlDeletedHistory = 'http://localhost:3900/api/deletedHistory';
+
+  private baseUrl = url+'/api/bills';
+  private baseUrlDeletedHistory = url+'/api/deletedHistory';
 
   constructor(private http: HttpClient) { }
 

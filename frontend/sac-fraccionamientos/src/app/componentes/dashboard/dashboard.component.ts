@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
+import { RolesService } from 'src/app/servicios/roles.service';
+import { NotificationsService } from 'src/app/servicios/notifications.service';
 
 @Component({
   selector: 'dashboard',
@@ -12,23 +14,48 @@ export class DashboardComponent implements OnInit {
   vista = '';
   cookieUser: string = '';
   tokenDecoded: any;
-  debtor= '';
-  rol ='';
-
+  debtor = '';
+  rol = '';
+  roles: any;
+  rolId: any;
+  claims: any;
+  claimNames: string[] = [];
+  notifications: any;
+  notificationsCounter = 0;
   constructor(
     private cookieService: CookieService,
-
+    private rolesService: RolesService,
+    private notificationService: NotificationsService
   ) { }
 
   ngOnInit(): void {
     this.cookieUser = this.cookieService.get('accessToken');
     this.tokenDecoded = this.getDecodedAccessToken(this.cookieUser);
     this.rol = this.tokenDecoded.rol;
-    console.log("rol", this.rol);
-    console.log("tokenDecoded", this.tokenDecoded)
-    if(this.cookieUser === '') {
+
+    this.rolesService.listOfClaims(this.rol).subscribe((names) => {
+      this.claimNames = names;
+      console.log('Claims de servicio:', this.claimNames);
+    });
+
+    this.notificationService.getNotificationsByUserId(this.tokenDecoded.id)
+      .subscribe(
+        (success) => {
+          this.notifications = success.data
+          this.notificationsCounter = this.notifications.filter((n: any) => n.Status === 'N').length;
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+    if (this.cookieUser === '') {
       window.location.href = '/login';
     }
+  }
+
+  hasClaim(name: string): boolean {
+    return this.claimNames.includes(name);
   }
 
   getDecodedAccessToken(accessToken: string): any {
@@ -45,7 +72,7 @@ export class DashboardComponent implements OnInit {
 
   cerrarSesion() {
     this.cookieService.delete('accessToken');
-    window.location.reload();
+    window.location.href = '/login';
   }
 
 }

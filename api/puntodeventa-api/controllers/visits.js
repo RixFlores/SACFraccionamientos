@@ -87,8 +87,33 @@ const deleteVisits = (req, res) => {
     });
 };
 
+const updateStatus = (req, res) => {
+    const { visitId, Status } = req.params;
+
+    if (!visitId || !Status) {
+        return res.status(400).json({ message: "Faltan campos requeridos" });
+    }
+
+    const sql = `UPDATE visits SET Status = ? WHERE VisitorId = ?`;
+
+    db.query(sql, [Status, visitId], (err, result) => {
+        if (err) {
+            console.error("Error al actualizar el estado de la visita:", err);
+            return res.status(500).json({ message: "Error interno del servidor" });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Visita no encontrada" });
+        }
+
+        res.status(200).json({ message: "Visita actualizado exitosamente" });
+    });
+};
+
+
 module.exports = {
     register,
     visits,
     deleteVisits,
+    updateStatus
 }

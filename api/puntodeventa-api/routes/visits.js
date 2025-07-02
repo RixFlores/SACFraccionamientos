@@ -20,6 +20,7 @@ const uploads = multer({ storage: storage });
 router.post("/register", visitsController.register);  // Registro de usuario
 router.get("/visits", visitsController.visits);          // Inicio de sesión
 router.delete("/delete/:VisitorId", visitsController.deleteVisits);  // Eliminar visita por ID
+router.put("/status/:visitId/:Status/", visitsController.updateStatus);  // Registro de usuario
 
 /*
 router.get("/profile/:id", check.auth, visitsController.profile);  // Obtener perfil de usuario por ID

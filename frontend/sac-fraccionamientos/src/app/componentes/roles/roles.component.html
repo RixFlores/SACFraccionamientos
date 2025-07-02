@@ -1,0 +1,61 @@
+<div style="padding: 20px;" class="background">
+    <div class="tableContainer">
+        <div class="row">
+            <h2>Crear nuevo rol</h2>
+        </div>
+        <div class="row" style="margin-top: 15px; margin-bottom: 15px;" *ngIf="hasClaim('Crear Roles')">
+            <div class="col">
+                <div class="form-container">
+                    <form [formGroup]="roleForm" (ngSubmit)="createRole()">
+                        <div class="row">
+                            <div class="col">
+                                <mat-form-field appearance="fill" style="width: auto !important;">
+                                    <mat-label>Rol</mat-label>
+                                    <input matInput type="text" formControlName="rol" required>
+                                    <mat-error *ngIf="roleForm.get('rol')?.hasError('required')">
+                                        El nombre del rol es obligatorio
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" type="submit" [disabled]="roleForm.invalid">Crear</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="width: 95%; margin: 0px auto;">
+            <div class="col">
+                <mat-accordion *ngIf="hasClaim('Ver Roles')">
+                    <mat-expansion-panel *ngFor="let role of rolesWithClaims">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ role.name }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+
+                        <form (ngSubmit)="saveClaims(role)">
+                            <div *ngFor="let claim of role.claimsEditable">
+                                <mat-checkbox [(ngModel)]="claim.selected" name="{{role.name}}-{{claim.name}}"
+                                    [ngModelOptions]="{ standalone: true }">
+                                    {{ claim.name }}
+                                </mat-checkbox>
+                            </div>
+                            <div class="row">
+                                <div class="col" style="text-align: left;">
+                                    <button class="btn btn-success" type="submit" *ngIf="hasClaim('Actualizar Roles')">Guardar</button>
+                                </div>
+                                <div class="col" style="text-align: right;">
+                                    <button class="btn btn-danger mt-2" type="button" (click)="deleteRole(role)" *ngIf="hasClaim('Eliminar Roles')">
+                                        Eliminar Rol
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+        </div>
+    </div>
+</div>

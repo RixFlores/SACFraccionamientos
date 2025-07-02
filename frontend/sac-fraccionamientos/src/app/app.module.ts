@@ -42,6 +42,18 @@ import { NotFoundComponent } from './componentes/not-found/not-found.component';
 import { CommentsComponent } from './componentes/comments/comments.component';
 import { DeleteCommentsComponent } from './componentes/dialogs/delete-comments/delete-comments.component';
 import { FinancesResumeComponent } from './componentes/finances-resume/finances-resume.component';
+import { CuotasComponent } from './componentes/cuotas/cuotas.component';
+import { DeleteCuotasComponent } from './componentes/dialogs/delete-cuotas/delete-cuotas.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { RolesComponent } from './componentes/roles/roles.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { DeleteRolesComponent } from './componentes/dialogs/delete-roles/delete-roles.component';
+import { MultasComponent } from './componentes/multas/multas.component';
+import { NotificacionesComponent } from './componentes/notificaciones/notificaciones.component';
+import { DeleteFineComponent } from './componentes/dialogs/delete-fine/delete-fine.component';
+import {MatRadioModule} from '@angular/material/radio';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   declarations: [
@@ -66,7 +78,14 @@ import { FinancesResumeComponent } from './componentes/finances-resume/finances-
     NotFoundComponent,
     CommentsComponent,
     DeleteCommentsComponent,
-    FinancesResumeComponent
+    FinancesResumeComponent,
+    CuotasComponent,
+    DeleteCuotasComponent,
+    RolesComponent,
+    DeleteRolesComponent,
+    MultasComponent,
+    NotificacionesComponent,
+    DeleteFineComponent
   ],
   imports: [
     BrowserModule,
@@ -89,6 +108,11 @@ import { FinancesResumeComponent } from './componentes/finances-resume/finances-
     MatDialogModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    NgxChartsModule,
+    MatExpansionModule,
+    MatCheckboxModule, 
+    MatRadioModule,
+    MatBadgeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

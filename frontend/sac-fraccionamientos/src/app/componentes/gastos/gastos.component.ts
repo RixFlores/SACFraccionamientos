@@ -8,6 +8,8 @@ import { registerLocaleData } from '@angular/common';
 import { DeleteBillsComponent } from '../dialogs/delete-bills/delete-bills.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/servicios/user.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { RolesService } from 'src/app/servicios/roles.service';
 registerLocaleData(localeEs, 'es');
 
 @Component({
@@ -23,24 +25,34 @@ export class GastosComponent implements OnInit {
   bills: any;
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
+  rol = '';
+  claimNames: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private billsService: BillsService,
     private cookieService: CookieService,
-    private dialog: MatDialog,
     private userService: UserService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private rolesService: RolesService
   ) { }
 
   ngOnInit(): void {
     this.cookieUser = this.cookieService.get('accessToken');
     this.tokenDecoded = this.getDecodedAccessToken(this.cookieUser);
-    console.log("tokenDecoded", this.tokenDecoded)
+    this.rol = this.tokenDecoded.rol;
 
     this.billsForm = this.fb.group({
       description: ['', [Validators.required]],
       amount: ['', Validators.required]
     });
+
+    this.rolesService.listOfClaims(this.rol).subscribe((names) => {
+      this.claimNames = names;
+      console.log('Claims de servicio:', this.claimNames);
+    });
+
     this.getBills();
   }
 
@@ -58,24 +70,44 @@ export class GastosComponent implements OnInit {
         next: (response) => {
           console.log('Registro exitoso:', response);
           this.message = 'Registro exitoso';
-          this.billsForm.reset();
+
+          // Mostrar snackbar
+          this.snackBar.open('Gasto registrado correctamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success']
+          });
+
+          this.ngOnInit();
         },
         error: (error) => {
           console.error('Error al registrar:', error);
           this.message = 'Error en el registro';
-          if (error.error?.msg) {
-            this.message = `Error: ${error.error.msg}`;
-          } else {
-            this.message = 'Error desconocido en el registro';
-          }
+          const errorMsg = error.error?.msg || 'Error desconocido en el registro';
+
+          this.snackBar.open(`Error: ${errorMsg}`, 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
         }
       });
 
     } else {
       console.log('Formulario inválido');
       this.message = 'Formulario inválido';
+
+      this.snackBar.open('Por favor completa todos los campos requeridos.', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-warning']
+      });
     }
   }
+
 
   updateStatus(bill: any, newStatus: string) {
 
@@ -105,6 +137,7 @@ export class GastosComponent implements OnInit {
       .subscribe(
         (success) => {
           this.bills = success.result
+          this.updatePagination();
           console.log(this.bills)
         },
         (error) => {
@@ -177,9 +210,6 @@ export class GastosComponent implements OnInit {
     this.billsService.getBills(inicio, fin).subscribe(
       data => {
         this.bills = data.result
-        console.log("INICIO", inicio);
-        console.log("FIN", fin);
-        console.log('Facturas: ', data);
       },
       error => {
         console.error('Error al obtener facturas:', error);
@@ -192,5 +222,36 @@ export class GastosComponent implements OnInit {
     if (event.index === 1) {
       this.getBills();
     }
+  }
+  
+  hasClaim(name: string): boolean {
+    return this.claimNames.includes(name);
+  }
+
+  
+  /* Paginador Bootstrap */
+  pagedBills: any[] = [];
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 0;
+  totalPagesArray: number[] = [];
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.bills.length / this.pageSize);
+    this.totalPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedBills = this.bills.slice(start, end);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  onPageSizeChange() {
+    this.currentPage = 1;
+    this.updatePagination();
   }
 }

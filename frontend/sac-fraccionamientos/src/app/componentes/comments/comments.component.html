@@ -1,5 +1,5 @@
 <mat-tab-group (selectedTabChange)="onTabChange($event)" class="background">
-    <mat-tab label="Registrar" (click)="ngOnInit()">
+    <mat-tab label="Registrar" (click)="ngOnInit()" *ngIf="hasClaim('Crear Comentarios')">
         <div class="mat-elevation-z2 formContainer">
             <h2>Comentarios</h2>
             <form [formGroup]="CommentsForm" (ngSubmit)="onSubmit()">
@@ -17,11 +17,11 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <button mat-raised-button color="primary" type="submit">Registrar</button>
+                <button class="btn btn-success" type="submit">Registrar</button>
             </form>
         </div>
     </mat-tab>
-    <mat-tab label="Listado" (click)="ngOnInit()" *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin'">
+    <mat-tab label="Listado" (click)="ngOnInit()" *ngIf="hasClaim('Ver Comentarios')">
         <div style="padding: 20px;" class="tableContainer">
             <h1>Listado de comentarios</h1>            
             <table class="table table-hover">
@@ -32,7 +32,7 @@
                         <th scope="col">Título</th>
                         <th scope="col">Comentario</th>
                         <th scope="col">Fecha</th>
-                        <th scope="col">Eliminar</th>
+                        <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,7 +43,7 @@
                         <td>{{comment.Message}}</td>
                         <td>{{comment.CreatedOn | date: "fullDate":"":"es" }}</td>
                         <td>
-                            <button class="btn btn-danger" (click)="deleteComment(comment)">
+                            <button class="btn btn-danger" (click)="deleteComment(comment)" *ngIf="hasClaim('Eliminar Comentarios')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-trash" viewBox="0 0 16 16">
                                     <path

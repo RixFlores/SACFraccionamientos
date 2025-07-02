@@ -5,6 +5,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { CommentsService } from 'src/app/servicios/comments.service';
 import { DeleteCommentsComponent } from '../dialogs/delete-comments/delete-comments.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { RolesService } from 'src/app/servicios/roles.service';
 
 @Component({
   selector: 'comments',
@@ -16,23 +18,32 @@ export class CommentsComponent implements OnInit {
   comments: any;
   cookieUser: string = '';
   tokenDecoded: any;
+  rol = '';
+  claimNames: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private commentsService: CommentsService,
     private cookieService: CookieService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private rolesService: RolesService
   ) { }
 
   ngOnInit(): void {
     this.cookieUser = this.cookieService.get('accessToken');
     this.tokenDecoded = this.getDecodedAccessToken(this.cookieUser);
+    this.rol = this.tokenDecoded.rol;
 
     this.CommentsForm = this.fb.group({
       Title: ['', [Validators.required]],
       Message: ['', Validators.required]
     });
 
+    this.rolesService.listOfClaims(this.rol).subscribe((names) => {
+      this.claimNames = names;
+      console.log('Claims de comentarios:', this.claimNames);
+    });
     this.getComments();
   }
 
@@ -60,15 +71,41 @@ export class CommentsComponent implements OnInit {
       this.commentsService.registerComments(payload).subscribe({
         next: (response) => {
           console.log('Registro exitoso:', response);
+
+          this.snackBar.open('Comentario enviado correctamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success']
+          });
+
           this.CommentsForm.reset();
+          this.CommentsForm.markAsPristine();
+          this.CommentsForm.markAsUntouched();
+          this.CommentsForm.updateValueAndValidity();
         },
         error: (error) => {
           console.error('Error al registrar:', error);
+          const errorMsg = error.error?.msg || 'Error desconocido al enviar el comentario';
+
+          this.snackBar.open(`Error: ${errorMsg}`, 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
         }
       });
 
     } else {
       console.log('Formulario inválido');
+
+      this.snackBar.open('Por favor completa todos los campos requeridos.', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-warning']
+      });
     }
   }
 
@@ -111,5 +148,9 @@ export class CommentsComponent implements OnInit {
     } catch (Error) {
       var invalid = "Invalid user";
     }
+  }
+  
+  hasClaim(name: string): boolean {
+    return this.claimNames.includes(name);
   }
 }

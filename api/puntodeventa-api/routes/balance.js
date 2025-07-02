@@ -18,7 +18,15 @@ const uploads = multer({ storage: storage });
 
 // Rutas
 router.post("/register", balanceController.register);  // Registro de usuario
-router.get("/balance/:UserId", balanceController.balance);  // Registro de usuario
+router.post("/registerForOne/:UserId", balanceController.registerForOne);  // Registro de usuario
+router.get("/balanceId/:UserId", balanceController.balanceById);  // Registro de usuario
+
+router.put("/balanceByIncome/:Description/:Concept/:Amount/:UserId/:Status", balanceController.balanceByIncome);  // Registro de usuario
+
+router.get("/balance", balanceController.balance);  // Registro de usuario
+router.put("/status/:cuotaId/:Status/", balanceController.updateStatus);  // Registro de usuario
+router.delete("/delete/:RecordId", balanceController.deleteBalance);  // Registro de usuario
+
 /* router.put("/status/:billId/:Status/:ApprovedBy", balanceController.updateStatus);  // Registro de usuario
 router.delete("/delete/:billId", balanceController.deletebalance);  // Registro de usuario
  */

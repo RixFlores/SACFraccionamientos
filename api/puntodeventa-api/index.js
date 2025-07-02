@@ -29,6 +29,9 @@ const visitsRoutes = require('./routes/visits');
 const deletedHistoryRoutes = require('./routes/deletedHistory');
 const balanceRoutes = require('./routes/balance');
 const commentsRoutes = require('./routes/comments');
+const rolesRoutes = require('./routes/roles');
+const finesRoutes = require('./routes/fines');
+const notificationsRoutes = require('./routes/notifications');
 
 /* 
 const cardContentRoutes = require('./routes/cardContentRoutes');
@@ -46,6 +49,9 @@ app.use('/api/visits', visitsRoutes);
 app.use('/api/deletedHistory', deletedHistoryRoutes);
 app.use('/api/balance', balanceRoutes);
 app.use('/api/comments', commentsRoutes);
+app.use('/api/roles', rolesRoutes);
+app.use('/api/fines', finesRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 /* 
 app.use('/api', cardContentRoutes);

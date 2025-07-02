@@ -1,5 +1,5 @@
 <mat-tab-group class="background">
-    <mat-tab label="Registrar"  *ngIf="tokenDecoded.rol == 'Mesa' || tokenDecoded.rol == 'Admin' || tokenDecoded.rol == 'Caseta'">
+    <mat-tab label="Registrar" *ngIf="hasClaim('Crear Visitas')">
         <div class="mat-elevation-z2 formContainer">
             <h2>Registro de Visitas</h2>
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
@@ -20,16 +20,6 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
-                </div>
-                <div class="row">
-                    <!-- <div class="col">
-                        <mat-form-field appearance="fill" class="w-100">
-                            <mat-label>Status</mat-label>
-                            <mat-select formControlName="status" required>
-                                <mat-option *ngFor="let status of statuses" [value]="status">{{ status }}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div> -->
                     <div class="col">
                         <mat-form-field appearance="fill" class="w-100">
                             <mat-label>Vehículo</mat-label>
@@ -46,11 +36,11 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <button mat-raised-button color="primary" type="submit">Registrar</button>
+                <button class="btn-success" type="submit">Registrar</button>
             </form>
         </div>
     </mat-tab>
-    <mat-tab label="Listado">
+    <mat-tab label="Listado" *ngIf="hasClaim('Ver Visitas')">
         <div style="padding: 20px;" class="tableContainer">
             <h2>Listado de visitas</h2>
             <table class="table table-hover">
@@ -75,21 +65,44 @@
                         <td style="text-align: center;">{{visits.NumberOfVisitors}}</td>
                         <td>{{visits.Vehicle}}</td>
                         <td>
-                            <div *ngIf="visits.Status == 'Entra'">
-                                <div class="alert alert-success" role="alert" style="text-align: center;">
-                                    {{visits.Status}}
+                            <ng-container *ngIf="hasClaim('Actualizar Visitas'); else viewOnly">
+                                <mat-form-field appearance="fill" style="min-width: 120px;" [ngClass]="{
+                                                            'status-aprobado': visits.Status === 'Entrada',
+                                                            'status-registrado': visits.Status === 'Fuera de horario',
+                                                            'status-salida': visits.Status === 'Salida'                                                            
+                                                        }">
+                                    <mat-select [value]="visits.Status"
+                                        (selectionChange)="updateStatus(visits, $event.value)">
+                                        <mat-option value="Entrada">Entrada</mat-option>
+                                        <mat-option value="Salida">Salida</mat-option>
+                                        <mat-option value="Fuera de horario">Fuera de horario</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </ng-container>
+
+                            <ng-template #viewOnly>
+                                <div *ngIf="visits.Status == 'Entrada'">
+                                    <div class="alert alert-warning" role="alert">
+                                        {{visits.Status}}
+                                    </div>
                                 </div>
-                            </div>
-                            <div *ngIf="visits.Status == 'Salio'">
-                                <div class="alert alert-secondary" role="alert" style="text-align: center;">
-                                    {{visits.Status}}
+                                <div *ngIf="visits.Status == 'Salida'">
+                                    <div class="alert alert-success" role="alert">
+                                        {{visits.Status}}
+                                    </div>
                                 </div>
-                            </div>
+                                <div *ngIf="visits.Status == 'Fuera de horario'">
+                                    <div class="alert alert-warning" role="alert">
+                                        {{visits.Status}}
+                                    </div>
+                                </div>
+                            </ng-template>
                         </td>
                         <td>{{visits.Date | date: "fullDate":"":"es" }}</td>
                         <td>{{visits.RegisteredByFullName}}</td>
                         <td>
-                            <button class="btn btn-danger" (click)="deleteVisit(visits)">
+                            <button class="btn btn-danger" (click)="deleteVisit(visits)"
+                                *ngIf="hasClaim('Eliminar Visitas')">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-trash" viewBox="0 0 16 16">
                                     <path

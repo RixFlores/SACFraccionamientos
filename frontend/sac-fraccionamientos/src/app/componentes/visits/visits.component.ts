@@ -6,6 +6,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
 import { DeleteVisitorsComponent } from '../dialogs/delete-visitors/delete-visitors.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { RolesService } from 'src/app/servicios/roles.service';
 
 @Component({
   selector: 'visits',
@@ -20,6 +22,8 @@ export class VisitsComponent implements OnInit {
   vehicles = ['Auto', 'Camioneta', 'Motocicleta', 'Bicicleta', 'Ninguno', 'Otro'];
   cookieUser: string = '';
   tokenDecoded: any;
+  rol = '';
+  claimNames: string[] = [];
 
   constructor(
     private visitsService: VisitsService,
@@ -27,11 +31,14 @@ export class VisitsComponent implements OnInit {
     private fb: FormBuilder,
     private cookieService: CookieService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private rolesService: RolesService
   ) { }
 
   ngOnInit(): void {
     this.cookieUser = this.cookieService.get('accessToken');
     this.tokenDecoded = this.getDecodedAccessToken(this.cookieUser);
+    this.rol = this.tokenDecoded.rol;
 
     this.registerForm = this.fb.group({
       Name: ['', Validators.required],
@@ -40,6 +47,11 @@ export class VisitsComponent implements OnInit {
       Vehicle: ['', Validators.required],
       NumberOfVisitors: ['', Validators.required],
       RegisteredBy: [this.tokenDecoded.id, Validators.required],
+    });
+
+    this.rolesService.listOfClaims(this.rol).subscribe((names) => {
+      this.claimNames = names;
+      console.log('Claims de servicio:', this.claimNames);
     });
 
     this.visitsService.getVisits()
@@ -61,7 +73,7 @@ export class VisitsComponent implements OnInit {
     if (this.registerForm.valid) {
       const payload = {
         Name: this.registerForm.value.Name,
-        UserId: this.registerForm.value.UserId, // o crea otro campo para esto
+        UserId: this.registerForm.value.UserId,
         Status: 'Entra',
         Vehicle: this.registerForm.value.Vehicle,
         NumberOfVisitors: this.registerForm.value.NumberOfVisitors,
@@ -72,6 +84,14 @@ export class VisitsComponent implements OnInit {
         next: (response) => {
           console.log('Registro exitoso:', response);
           this.message = 'Registro exitoso';
+
+          this.snackBar.open('Visita registrada correctamente', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success']
+          });
+
           this.registerForm.reset({
             Name: '',
             UserId: null,
@@ -81,23 +101,35 @@ export class VisitsComponent implements OnInit {
             RegisteredBy: this.tokenDecoded.id
           });
 
+          this.ngOnInit();
         },
         error: (error) => {
           console.error('Error al registrar:', error);
-          this.message = 'Error en el registro';
-          if (error.error?.msg) {
-            this.message = `Error: ${error.error.msg}`;
-          } else {
-            this.message = 'Error desconocido en el registro';
-          }
+          const errorMsg = error.error?.msg || 'Error desconocido en el registro';
+          this.message = errorMsg;
+
+          this.snackBar.open(`Error: ${errorMsg}`, 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
         }
       });
 
     } else {
       console.log('Formulario inválido');
       this.message = 'Formulario inválido';
+
+      this.snackBar.open('Por favor completa todos los campos requeridos.', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-warning']
+      });
     }
   }
+
 
   getUsers() {
     this.userService.getUsers()
@@ -112,6 +144,19 @@ export class VisitsComponent implements OnInit {
       );
   }
 
+    updateStatus(visit: any, newStatus: string) {
+      console.log("visita", visit)
+    this.visitsService.updateVisitStatus(visit.VisitorId, newStatus).subscribe({
+      next: (response) => {
+        console.log('Visita actualizado:', response);
+        this.ngOnInit(); // Recarga la lista
+      },
+      error: (error) => {
+        console.error('Error al actualizar la visita:', error);
+        this.message = 'Error al actualizar la visita';
+      }
+    });
+  }
 
   getDecodedAccessToken(accessToken: string): any {
     try {
@@ -149,4 +194,8 @@ export class VisitsComponent implements OnInit {
     });
   }
 
+
+  hasClaim(name: string): boolean {
+    return this.claimNames.includes(name);
+  }
 }

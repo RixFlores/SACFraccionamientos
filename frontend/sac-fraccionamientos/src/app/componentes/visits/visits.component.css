@@ -1,0 +1,85 @@
+::ng-deep .mat-tab-header {
+  background-color: white;
+}
+
+.status-registrado {
+  background-color: #fff3cd; /* Amarillo claro */
+  border-radius: 4px;
+}
+
+.status-salida {
+  background-color: #fff3cd; /* Amarillo claro */
+  border-radius: 4px;
+}
+
+.status-aprobado {
+  background-color: #d4edda; /* Verde claro */
+  border-radius: 4px;
+}
+
+.status-rechazado {
+  background-color: #f8d7da; /* Rojo claro */
+  border-radius: 4px;
+}
+
+.status-aprobado .mat-select-trigger {
+  color: #155724; /* Verde oscuro */
+}
+
+/* Contenedor de formulario */
+.formContainer {
+  padding: 20px;
+  width: 90%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Contenedor de la tabla con scroll horizontal en móviles */
+.tableContainer {
+  overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Responsividad general para filas de formularios */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.col {
+  flex: 1;
+  min-width: 250px; /* Evita que se colapsen mucho */
+}
+
+/* Evita que los campos de formulario se estiren más de la cuenta */
+mat-form-field {
+  width: 100%;
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 600px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .col {
+    width: 100%;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  .alert {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}

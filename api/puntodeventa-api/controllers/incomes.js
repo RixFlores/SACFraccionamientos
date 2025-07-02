@@ -86,10 +86,6 @@ const incomes = (req, res) => {
     }
 };
 
-
-
-
-
 const deleteIncomes = (req, res) => {
     const { IncomeId } = req.params;
 
@@ -136,9 +132,10 @@ const updateStatus = (req, res) => {
     });
 };
 
+
 module.exports = {
     register,
     incomes,
     deleteIncomes,
-    updateStatus
+    updateStatus,
 }
